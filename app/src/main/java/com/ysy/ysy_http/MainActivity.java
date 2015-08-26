@@ -8,7 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.ysy.http.ICallback;
+import com.ysy.http.Callback;
 import com.ysy.http.Request;
 import com.ysy.http.RequestTask;
 
@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.mRunOnSubThreadBtn:
-                testHttpPostOnSubThread();
+                //testHttpPostOnSubThread();
                 testHttpPostOnSubThreadForGeneric();
                 break;
         }
@@ -60,7 +60,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String content = "account=stay4it&password=123456";
         Request request = new Request(url, Request.RequestMethod.POST);
 
-        request.setCallback(new ICallback<String>() {
+        request.setCallback(new Callback<String>() {
+
             @Override
             public void onSucess(String Result) {
                 Log.e("stay", "testHttpGet return:" + Result);
@@ -77,6 +78,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void testHttpPostOnSubThreadForGeneric() {
+        String url = "http://api.stay4it.com/v1/public/core/?service=user.login";
+        String content = "account=stay4it&password=123456";
+        Request request = new Request(url, Request.RequestMethod.POST);
+        request.setCallback(new Callback<User>() {
 
+            @Override
+            public void onSucess(User result) {
+                Log.e("stay", "testHttpGet return:" + result.toString());
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+            }
+
+
+        }.setReturnType(User.class));
+        request.content = content;
+        RequestTask task = new RequestTask(request);
+        task.execute();
     }
 }

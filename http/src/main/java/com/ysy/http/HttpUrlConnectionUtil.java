@@ -1,7 +1,5 @@
 package com.ysy.http;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
@@ -12,7 +10,7 @@ import java.util.Map;
  */
 public class HttpUrlConnectionUtil {
 
-    public static String excute(Request request) throws Exception {
+    public static HttpURLConnection excute(Request request) throws Exception {
         switch (request.method) {
             case GET:
             case DELETE:
@@ -20,36 +18,22 @@ public class HttpUrlConnectionUtil {
 
             case POST:
             case PUT:
-               return post(request);
+                return post(request);
         }
         return null;
     }
 
-    private static String get(Request request) throws Exception {
+    private static HttpURLConnection get(Request request) throws Exception {
         HttpURLConnection connection = (HttpURLConnection) new URL(request.url).openConnection();
         connection.setRequestMethod(request.method.name());
         connection.setConnectTimeout(15 * 3000);
         connection.setReadTimeout(15 * 3000);
 
-        addHeader(connection, request.headers);
-        int status = connection.getResponseCode();
-        if (status == HttpURLConnection.HTTP_OK) {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            InputStream is = connection.getInputStream();
-            byte[] buff = new byte[2048];
-            int len;
-            while ((len = is.read(buff)) != -1) {
-                out.write(buff, 0, len);
-            }
-            is.close();
-            out.flush();
-            out.close();
-            return new String(out.toByteArray());
-        }
-        return null;
+
+        return connection;
     }
 
-    private static String post(Request request) throws Exception {
+    private static HttpURLConnection post(Request request) throws Exception {
         HttpURLConnection connection = (HttpURLConnection) new URL(request.url).openConnection();
         connection.setRequestMethod(request.method.name());
         connection.setConnectTimeout(15 * 3000);
@@ -58,22 +42,8 @@ public class HttpUrlConnectionUtil {
 
         addHeader(connection, request.headers);
 
-        int status = connection.getResponseCode();
-        if (status == HttpURLConnection.HTTP_OK) {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            InputStream is = connection.getInputStream();
-            byte[] buff = new byte[2048];
-            int len;
-            while ((len = is.read(buff)) != -1) {
-                out.write(buff, 0, len);
-            }
-            is.close();
-            out.flush();
-            out.close();
-            return new String(out.toByteArray());
-        }
 
-        return null;
+        return connection;
     }
 
 
