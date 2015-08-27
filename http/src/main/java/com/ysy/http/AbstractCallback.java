@@ -1,20 +1,14 @@
 package com.ysy.http;
 
-import com.google.gson.Gson;
-
-import org.json.JSONObject;
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 
 /**
  * User: ysy
- * Date: 2015/8/26
+ * Date: 2015/8/27
  */
-public abstract class Callback<T> implements ICallback<T> {
-    private Class<T> clz;
-
+public abstract class AbstractCallback<T> implements ICallback<T> {
     @Override
     public T parse(HttpURLConnection connection) throws Exception {
         int status = connection.getResponseCode();
@@ -30,17 +24,10 @@ public abstract class Callback<T> implements ICallback<T> {
             out.flush();
             out.close();
             String result = new String(out.toByteArray());
-            JSONObject json = new JSONObject(result);
-            JSONObject data = json.optJSONObject("data");
-            Gson gson = new Gson();
-            System.out.println("result="+result);
-            return gson.fromJson(data.toString(), clz);
+            return bindData(result);
         }
         return null;
     }
 
-    public ICallback setReturnType(Class<T> clz) {
-        this.clz = clz;
-        return this;
-    }
+    protected abstract T bindData(String result) throws Exception;
 }

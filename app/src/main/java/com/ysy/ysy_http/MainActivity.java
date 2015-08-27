@@ -8,7 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
-import com.ysy.http.Callback;
+import com.ysy.http.JsonCallback;
 import com.ysy.http.Request;
 import com.ysy.http.RequestTask;
 
@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String content = "account=stay4it&password=123456";
         Request request = new Request(url, Request.RequestMethod.POST);
 
-        request.setCallback(new Callback<String>() {
+        request.setCallback(new JsonCallback<String>() {
 
             @Override
             public void onSucess(String Result) {
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String url = "http://api.stay4it.com/v1/public/core/?service=user.login";
         String content = "account=stay4it&password=123456";
         Request request = new Request(url, Request.RequestMethod.POST);
-        request.setCallback(new Callback<User>() {
+        request.setCallback(new JsonCallback<User>() {
 
             @Override
             public void onSucess(User result) {
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
 
-        }.setReturnType(User.class));
+        });
         request.content = content;
         RequestTask task = new RequestTask(request);
         task.execute();
