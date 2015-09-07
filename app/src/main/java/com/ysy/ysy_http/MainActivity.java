@@ -1,6 +1,7 @@
 package com.ysy.ysy_http;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -8,9 +9,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.ysy.http.FileCallback;
 import com.ysy.http.JsonCallback;
 import com.ysy.http.Request;
 import com.ysy.http.RequestTask;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private Button mRunOnSubThreadBtn;
@@ -50,7 +54,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.mRunOnSubThreadBtn:
                 //testHttpPostOnSubThread();
-                testHttpPostOnSubThreadForGeneric();
+                //testHttpPostOnSubThreadForGeneric();
+                testHttpPostOnSubThreadForDownload();
                 break;
         }
     }
@@ -95,6 +100,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         });
+        request.content = content;
+        RequestTask task = new RequestTask(request);
+        task.execute();
+    }
+
+    public void testHttpPostOnSubThreadForDownload() {
+        String url = "http://api.stay4it.com/v1/public/core/?service=user.login";
+        String content = "account=stay4it&password=123456";
+        Request request = new Request(url, Request.RequestMethod.POST);
+        String path = Environment.getExternalStorageDirectory() + File.separator + "filedownload.txt";
+        request.setCallback(new FileCallback() {
+            @Override
+            public void onSucess(String Result) {
+                Log.e("ysy", Result);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        }.setCachePath(path));
         request.content = content;
         RequestTask task = new RequestTask(request);
         task.execute();
