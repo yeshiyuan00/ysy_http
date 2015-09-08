@@ -5,7 +5,7 @@ package com.ysy.http;
  */
 public  abstract class FileCallback extends AbstractCallback<String>{
     @Override
-    protected String bindData(String path) throws Exception {
+    protected String bindData(String path) throws AppException {
         return path;
     }
 }

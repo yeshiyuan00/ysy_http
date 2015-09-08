@@ -13,49 +13,55 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
     private String path;
 
     @Override
-    public T parse(HttpURLConnection connection) throws Exception {
+    public T parse(HttpURLConnection connection) throws AppException {
         return parse(connection, null);
     }
 
     @Override
-    public T parse(HttpURLConnection connection, OnProgressUpdatedListener listener) throws Exception {
-        int status = connection.getResponseCode();
-        if (status == HttpURLConnection.HTTP_OK) {
-            if (path == null) {
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                InputStream is = connection.getInputStream();
-                byte[] buff = new byte[2048];
-                int len;
-                while ((len = is.read(buff)) != -1) {
-                    out.write(buff, 0, len);
+    public T parse(HttpURLConnection connection, OnProgressUpdatedListener listener) throws AppException {
+        try {
+            int status = connection.getResponseCode();
+            if (status == HttpURLConnection.HTTP_OK) {
+                if (path == null) {
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    InputStream is = connection.getInputStream();
+                    byte[] buff = new byte[2048];
+                    int len;
+                    while ((len = is.read(buff)) != -1) {
+                        out.write(buff, 0, len);
+                    }
+                    is.close();
+                    out.flush();
+                    out.close();
+                    String result = new String(out.toByteArray());
+                    return bindData(result);
+                } else {
+                    FileOutputStream out = new FileOutputStream(path);
+                    InputStream is = connection.getInputStream();
+                    int TotalLen = connection.getContentLength();
+                    int CurLen = 0;
+                    byte[] buff = new byte[2048];
+                    int len;
+                    while ((len = is.read(buff)) != -1) {
+                        out.write(buff, 0, len);
+                        CurLen += len;
+                        listener.onProgressUpdated(CurLen, TotalLen);
+                    }
+                    is.close();
+                    out.flush();
+                    out.close();
+                    return bindData(path);
                 }
-                is.close();
-                out.flush();
-                out.close();
-                String result = new String(out.toByteArray());
-                return bindData(result);
             } else {
-                FileOutputStream out = new FileOutputStream(path);
-                InputStream is = connection.getInputStream();
-                int TotalLen = connection.getContentLength();
-                int CurLen = 0;
-                byte[] buff = new byte[2048];
-                int len;
-                while ((len = is.read(buff)) != -1) {
-                    out.write(buff, 0, len);
-                    CurLen += len;
-                    listener.onProgressUpdated(CurLen, TotalLen);
-                }
-                is.close();
-                out.flush();
-                out.close();
-                return bindData(path);
+                throw new AppException(status, connection.getResponseMessage());
             }
+        } catch (Exception e) {
+            throw new AppException(e.getMessage());
         }
-        return null;
+
     }
 
-    protected abstract T bindData(String result) throws Exception;
+    protected abstract T bindData(String result) throws AppException;
 
     public ICallback setCachePath(String path) {
         this.path = path;

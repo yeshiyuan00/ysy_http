@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.ysy.http.AppException;
 import com.ysy.http.FileCallback;
 import com.ysy.http.JsonCallback;
 import com.ysy.http.Request;
@@ -74,9 +75,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onFailure(Exception e) {
+            public void onFailure(AppException e) {
+                if (e.statusCode == 403) {
+                    if ("password incorrect".equals(e.responseMessage)) {
+//                        TODO
+                    }
+                }
                 e.printStackTrace();
             }
+
         });
         request.content = content;
         RequestTask task = new RequestTask(request);
@@ -95,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onFailure(Exception e) {
+            public void onFailure(AppException e) {
                 e.printStackTrace();
             }
 
@@ -118,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onFailure(Exception e) {
+            public void onFailure(AppException e) {
 
             }
         }.setCachePath(path));
@@ -144,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             @Override
-            public void onFailure(Exception e) {
+            public void onFailure(AppException e) {
 
             }
         }.setCachePath(path));

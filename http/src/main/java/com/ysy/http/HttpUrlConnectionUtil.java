@@ -1,5 +1,6 @@
 package com.ysy.http;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
@@ -10,7 +11,7 @@ import java.util.Map;
  */
 public class HttpUrlConnectionUtil {
 
-    public static HttpURLConnection excute(Request request) throws Exception {
+    public static HttpURLConnection excute(Request request) throws AppException {
         switch (request.method) {
             case GET:
             case DELETE:
@@ -23,27 +24,35 @@ public class HttpUrlConnectionUtil {
         return null;
     }
 
-    private static HttpURLConnection get(Request request) throws Exception {
-        HttpURLConnection connection = (HttpURLConnection) new URL(request.url).openConnection();
-        connection.setRequestMethod(request.method.name());
-        connection.setConnectTimeout(15 * 3000);
-        connection.setReadTimeout(15 * 3000);
+    private static HttpURLConnection get(Request request) throws AppException {
+        try {
+            HttpURLConnection connection = null;
 
+            connection = (HttpURLConnection) new URL(request.url).openConnection();
 
-        return connection;
+            connection.setRequestMethod(request.method.name());
+            connection.setConnectTimeout(15 * 3000);
+            connection.setReadTimeout(15 * 3000);
+            return connection;
+        } catch (IOException e) {
+            throw new AppException(e.getMessage());
+        }
     }
 
-    private static HttpURLConnection post(Request request) throws Exception {
-        HttpURLConnection connection = (HttpURLConnection) new URL(request.url).openConnection();
-        connection.setRequestMethod(request.method.name());
-        connection.setConnectTimeout(15 * 3000);
-        connection.setReadTimeout(15 * 3000);
-        connection.setDoOutput(true);
+    private static HttpURLConnection post(Request request) throws AppException {
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(request.url).openConnection();
+            connection.setRequestMethod(request.method.name());
+            connection.setConnectTimeout(15 * 3000);
+            connection.setReadTimeout(15 * 3000);
+            connection.setDoOutput(true);
 
-        addHeader(connection, request.headers);
+            addHeader(connection, request.headers);
+            return connection;
+        } catch (IOException e) {
+            throw new AppException(e.getMessage());
+        }
 
-
-        return connection;
     }
 
 

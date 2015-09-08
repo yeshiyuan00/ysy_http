@@ -5,7 +5,7 @@ package com.ysy.http;
  */
 public abstract class StringCAllback extends AbstractCallback<String> {
     @Override
-    protected String bindData(String result) throws Exception {
+    protected String bindData(String result) throws AppException {
         return result;
     }
 }
