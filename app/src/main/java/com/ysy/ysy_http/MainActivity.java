@@ -55,7 +55,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.mRunOnSubThreadBtn:
                 //testHttpPostOnSubThread();
                 //testHttpPostOnSubThreadForGeneric();
-                testHttpPostOnSubThreadForDownload();
+                //testHttpPostOnSubThreadForDownload();
+                testHttpPostOnSubThreadForDownloadProgress();
                 break;
         }
     }
@@ -122,6 +123,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }.setCachePath(path));
         request.content = content;
+        RequestTask task = new RequestTask(request);
+        task.execute();
+    }
+
+    public void testHttpPostOnSubThreadForDownloadProgress() {
+        String url = "http://api.stay4it.com/uploads/test.jpg";
+        Request request = new Request(url, Request.RequestMethod.GET);
+        String path = Environment.getExternalStorageDirectory() + File.separator + "test.jpg";
+        request.setCallback(new FileCallback() {
+
+            @Override
+            public void onProgressUpdated(int curLen, int totalLen) {
+                Log.e("ysy", "download:" + curLen + "/" + totalLen);
+            }
+
+            @Override
+            public void onSucess(String Result) {
+                Log.e("ysy", Result);
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+
+            }
+        }.setCachePath(path));
+        request.enableProgressUpdated(true);
         RequestTask task = new RequestTask(request);
         task.execute();
     }
