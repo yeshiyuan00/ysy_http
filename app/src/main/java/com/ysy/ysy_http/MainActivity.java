@@ -2,7 +2,6 @@ package com.ysy.ysy_http;
 
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,7 +16,7 @@ import com.ysy.http.RequestTask;
 
 import java.io.File;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
     private Button mRunOnSubThreadBtn;
 
     @Override
@@ -79,12 +78,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (e.statusCode == 403) {
                     if ("password incorrect".equals(e.responseMessage)) {
 //                        TODO
+                    } else if ("token invalid".equals(e.responseMessage)) {
+//                        TODO relogin
                     }
                 }
                 e.printStackTrace();
             }
 
         });
+        request.setGlobalExceptionListener(this);
         request.content = content;
         RequestTask task = new RequestTask(request);
         task.execute();

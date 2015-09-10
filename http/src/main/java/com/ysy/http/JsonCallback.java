@@ -22,8 +22,8 @@ public abstract class JsonCallback<T> extends AbstractCallback<T> {
             Gson gson = new Gson();
             Type type = ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
             return gson.fromJson(data.toString(), type);
-        }catch (JSONException e){
-            throw new AppException(e.getMessage());
+        } catch (JSONException e) {
+            throw new AppException(AppException.ErrorType.JSON, e.getMessage());
         }
     }
 }

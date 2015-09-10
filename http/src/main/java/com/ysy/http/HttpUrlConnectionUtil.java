@@ -1,6 +1,9 @@
 package com.ysy.http;
 
+import android.webkit.URLUtil;
+
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
@@ -12,6 +15,9 @@ import java.util.Map;
 public class HttpUrlConnectionUtil {
 
     public static HttpURLConnection excute(Request request) throws AppException {
+        if (!URLUtil.isNetworkUrl(request.url)) {
+            throw new AppException(AppException.ErrorType.MANUAL, "the url :" + request.url + " is not valid");
+        }
         switch (request.method) {
             case GET:
             case DELETE:
@@ -34,8 +40,10 @@ public class HttpUrlConnectionUtil {
             connection.setConnectTimeout(15 * 3000);
             connection.setReadTimeout(15 * 3000);
             return connection;
+        } catch (InterruptedIOException e) {
+            throw new AppException(AppException.ErrorType.TIMEOUT, e.getMessage());
         } catch (IOException e) {
-            throw new AppException(e.getMessage());
+            throw new AppException(AppException.ErrorType.SERVER, e.getMessage());
         }
     }
 
@@ -49,8 +57,10 @@ public class HttpUrlConnectionUtil {
 
             addHeader(connection, request.headers);
             return connection;
+        } catch (InterruptedIOException e) {
+            throw new AppException(AppException.ErrorType.TIMEOUT, e.getMessage());
         } catch (IOException e) {
-            throw new AppException(e.getMessage());
+            throw new AppException(AppException.ErrorType.SERVER, e.getMessage());
         }
 
     }

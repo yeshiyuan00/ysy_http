@@ -25,7 +25,11 @@ public class RequestTask extends AsyncTask<Void, Integer, Object> {
     protected void onPostExecute(Object o) {
         super.onPostExecute(o);
         if (o instanceof AppException) {
-            request.iCallback.onFailure((AppException) o);
+            if (request.onGlobalExceptionListener != null) {
+                if (!request.onGlobalExceptionListener.handleException((AppException) o)) {
+                    request.iCallback.onFailure((AppException) o);
+                }
+            }
         } else {
             request.iCallback.onSucess(o);
         }
@@ -33,6 +37,10 @@ public class RequestTask extends AsyncTask<Void, Integer, Object> {
 
     @Override
     protected Object doInBackground(Void... params) {
+      return request(0);
+    }
+
+    public Object request(int retry) {
         try {
             HttpURLConnection connection = HttpUrlConnectionUtil.excute(request);
             if (request.enableProgressUpdated) {
@@ -46,6 +54,12 @@ public class RequestTask extends AsyncTask<Void, Integer, Object> {
                 return request.iCallback.parse(connection);
             }
         } catch (AppException e) {
+            if (e.type == AppException.ErrorType.TIMEOUT) {
+                if (retry < request.maxRetryCount) {
+                    retry++;
+                    return request(retry);
+                }
+            }
             return e;
         }
     }

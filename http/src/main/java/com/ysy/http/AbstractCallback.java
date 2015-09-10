@@ -56,7 +56,7 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
                 throw new AppException(status, connection.getResponseMessage());
             }
         } catch (Exception e) {
-            throw new AppException(e.getMessage());
+            throw new AppException(AppException.ErrorType.SERVER, e.getMessage());
         }
 
     }

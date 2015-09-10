@@ -9,9 +9,14 @@ import java.util.Map;
 public class Request {
     public ICallback iCallback;
     public boolean enableProgressUpdated = false;
+    public OnGlobalExceptionListener onGlobalExceptionListener;
 
     public void setCallback(ICallback iCallback) {
         this.iCallback = iCallback;
+    }
+
+    public void setGlobalExceptionListener(OnGlobalExceptionListener onGlobalExceptionListener) {
+        this.onGlobalExceptionListener = onGlobalExceptionListener;
     }
 
     public void enableProgressUpdated(boolean enable) {
@@ -21,6 +26,8 @@ public class Request {
     public enum RequestMethod {
         GET, POST, PUT, DELETE
     }
+
+    public int maxRetryCount = 3;
 
     public String url;
     public String content;
