@@ -37,11 +37,17 @@ public class RequestTask extends AsyncTask<Void, Integer, Object> {
 
     @Override
     protected Object doInBackground(Void... params) {
-      return request(0);
+        return request(0);
+    }
+
+    @Override
+    protected void onCancelled() {
+        super.onCancelled();
     }
 
     public Object request(int retry) {
         try {
+            isCancelled();
             HttpURLConnection connection = HttpUrlConnectionUtil.excute(request);
             if (request.enableProgressUpdated) {
                 return request.iCallback.parse(connection, new OnProgressUpdatedListener() {

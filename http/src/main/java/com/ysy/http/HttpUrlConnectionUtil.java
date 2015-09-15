@@ -4,6 +4,7 @@ import android.webkit.URLUtil;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Map;
@@ -32,6 +33,8 @@ public class HttpUrlConnectionUtil {
 
     private static HttpURLConnection get(Request request) throws AppException {
         try {
+
+            request.checkIfCancelled();
             HttpURLConnection connection = null;
 
             connection = (HttpURLConnection) new URL(request.url).openConnection();
@@ -39,6 +42,8 @@ public class HttpUrlConnectionUtil {
             connection.setRequestMethod(request.method.name());
             connection.setConnectTimeout(15 * 3000);
             connection.setReadTimeout(15 * 3000);
+
+            request.checkIfCancelled();
             return connection;
         } catch (InterruptedIOException e) {
             throw new AppException(AppException.ErrorType.TIMEOUT, e.getMessage());
@@ -49,6 +54,7 @@ public class HttpUrlConnectionUtil {
 
     private static HttpURLConnection post(Request request) throws AppException {
         try {
+            request.checkIfCancelled();
             HttpURLConnection connection = (HttpURLConnection) new URL(request.url).openConnection();
             connection.setRequestMethod(request.method.name());
             connection.setConnectTimeout(15 * 3000);
@@ -56,6 +62,12 @@ public class HttpUrlConnectionUtil {
             connection.setDoOutput(true);
 
             addHeader(connection, request.headers);
+            request.checkIfCancelled();
+
+            OutputStream os = connection.getOutputStream();
+            os.write(request.content.getBytes());
+
+            request.checkIfCancelled();
             return connection;
         } catch (InterruptedIOException e) {
             throw new AppException(AppException.ErrorType.TIMEOUT, e.getMessage());

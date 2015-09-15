@@ -23,6 +23,17 @@ public class Request {
         this.enableProgressUpdated = enable;
     }
 
+    public void checkIfCancelled() throws AppException {
+        if (isCancelled) {
+            throw new AppException(AppException.ErrorType.CANCEL, "the request has been cancelled");
+        }
+    }
+
+    public void cancel() {
+        isCancelled = true;
+        iCallback.cancel();
+    }
+
     public enum RequestMethod {
         GET, POST, PUT, DELETE
     }
@@ -32,6 +43,8 @@ public class Request {
     public String url;
     public String content;
     public Map<String, String> headers;
+
+    public volatile boolean isCancelled;
 
     public RequestMethod method;
 

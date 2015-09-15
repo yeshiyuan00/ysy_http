@@ -11,6 +11,7 @@ import java.net.HttpURLConnection;
  */
 public abstract class AbstractCallback<T> implements ICallback<T> {
     private String path;
+    private volatile boolean isCancelled;
 
     @Override
     public T parse(HttpURLConnection connection) throws AppException {
@@ -20,6 +21,7 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
     @Override
     public T parse(HttpURLConnection connection, OnProgressUpdatedListener listener) throws AppException {
         try {
+            checkIfCancelled();
             int status = connection.getResponseCode();
             if (status == HttpURLConnection.HTTP_OK) {
                 if (path == null) {
@@ -28,6 +30,7 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
                     byte[] buff = new byte[2048];
                     int len;
                     while ((len = is.read(buff)) != -1) {
+                        checkIfCancelled();
                         out.write(buff, 0, len);
                     }
                     is.close();
@@ -43,6 +46,7 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
                     byte[] buff = new byte[2048];
                     int len;
                     while ((len = is.read(buff)) != -1) {
+                        checkIfCancelled();
                         out.write(buff, 0, len);
                         CurLen += len;
                         listener.onProgressUpdated(CurLen, TotalLen);
@@ -62,6 +66,16 @@ public abstract class AbstractCallback<T> implements ICallback<T> {
     }
 
     protected abstract T bindData(String result) throws AppException;
+
+    protected void checkIfCancelled() throws AppException {
+        if (isCancelled){
+            throw new AppException(AppException.ErrorType.CANCEL,"the request has been cancelled");
+        }
+    }
+    @Override
+    public void cancel() {
+        isCancelled = true;
+    }
 
     public ICallback setCachePath(String path) {
         this.path = path;

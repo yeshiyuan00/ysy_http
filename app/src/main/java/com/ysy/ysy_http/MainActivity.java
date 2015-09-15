@@ -111,8 +111,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         });
         request.content = content;
+        request.maxRetryCount=0;
         RequestTask task = new RequestTask(request);
         task.execute();
+        task.cancel(true);
+        request.cancel();
     }
 
     public void testHttpPostOnSubThreadForDownload() {
