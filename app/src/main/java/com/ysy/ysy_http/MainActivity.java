@@ -12,6 +12,7 @@ import com.ysy.http.AppException;
 import com.ysy.http.FileCallback;
 import com.ysy.http.JsonCallback;
 import com.ysy.http.Request;
+import com.ysy.http.RequestManager;
 import com.ysy.http.RequestTask;
 
 import java.io.File;
@@ -27,6 +28,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         mRunOnSubThreadBtn.setOnClickListener(this);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        RequestManager.getInstance().cancelRequest(toString());
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -149,6 +155,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             @Override
             public void onProgressUpdated(int curLen, int totalLen) {
                 Log.e("ysy", "download:" + curLen + "/" + totalLen);
+                for (int i =0 ; i<10000; i++){
+
+                }
             }
 
             @Override
@@ -168,17 +177,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     public void testHttpPostOnSubThreadForDownloadProgressCancelTest() {
 
-        String url = "http://api.stay4it.com/uploads/test.jpg";
+        String url = "http://a.hiphotos.baidu.com/image/pic/item/c8ea15ce36d3d539066f92cb3887e950352ab06c.jpg";
         final  Request request = new Request(url, Request.RequestMethod.GET);
-        final RequestTask task = new RequestTask(request);
-        String path = Environment.getExternalStorageDirectory() + File.separator + "test.jpg";
+        //final RequestTask task = new RequestTask(request);
+        String path = Environment.getExternalStorageDirectory() + File.separator + "test2.jpg";
         request.setCallback(new FileCallback() {
             @Override
             public void onProgressUpdated(int curLen, int totalLen) {
+                for (int i =0 ; i<100000; i++){
+
+                }
                 Log.e("stay", "download:" + curLen + "/" + totalLen);
                 if(curLen * 100l / totalLen > 50){
 //                    task.cancel(true);
-                    request.cancel();
+                  //  request.cancel();
                 }
             }
 
@@ -197,7 +209,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         }.setCachePath(path));
         request.enableProgressUpdated(true);
-
-        task.execute();
+        request.setTag(toString());
+        RequestManager.getInstance().performRequest(request);
     }
 }

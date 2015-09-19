@@ -10,6 +10,7 @@ public class Request {
     public ICallback iCallback;
     public boolean enableProgressUpdated = false;
     public OnGlobalExceptionListener onGlobalExceptionListener;
+    public String tag;
 
     public void setCallback(ICallback iCallback) {
         this.iCallback = iCallback;
@@ -33,6 +34,11 @@ public class Request {
         isCancelled = true;
         iCallback.cancel();
     }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
 
     public enum RequestMethod {
         GET, POST, PUT, DELETE
