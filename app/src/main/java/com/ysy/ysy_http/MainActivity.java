@@ -56,7 +56,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 //testHttpPostOnSubThread();
                 //testHttpPostOnSubThreadForGeneric();
                 //testHttpPostOnSubThreadForDownload();
-                testHttpPostOnSubThreadForDownloadProgress();
+//                testHttpPostOnSubThreadForDownloadProgress();
+                testHttpPostOnSubThreadForDownloadProgressCancelTest();
                 break;
         }
     }
@@ -69,7 +70,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         request.setCallback(new JsonCallback<String>() {
 
             @Override
-            public void onSucess(String Result) {
+            public void onSuccess(String Result) {
                 Log.e("stay", "testHttpGet return:" + Result);
             }
 
@@ -99,7 +100,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         request.setCallback(new JsonCallback<User>() {
 
             @Override
-            public void onSucess(User result) {
+            public void onSuccess(User result) {
                 Log.e("stay", "testHttpGet return:" + result.toString());
             }
 
@@ -125,7 +126,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         String path = Environment.getExternalStorageDirectory() + File.separator + "filedownload.txt";
         request.setCallback(new FileCallback() {
             @Override
-            public void onSucess(String Result) {
+            public void onSuccess(String Result) {
                 Log.e("ysy", Result);
             }
 
@@ -151,7 +152,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
 
             @Override
-            public void onSucess(String Result) {
+            public void onSuccess(String Result) {
                 Log.e("ysy", Result);
             }
 
@@ -162,6 +163,41 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         }.setCachePath(path));
         request.enableProgressUpdated(true);
         RequestTask task = new RequestTask(request);
+        task.execute();
+    }
+
+    public void testHttpPostOnSubThreadForDownloadProgressCancelTest() {
+
+        String url = "http://api.stay4it.com/uploads/test.jpg";
+        final  Request request = new Request(url, Request.RequestMethod.GET);
+        final RequestTask task = new RequestTask(request);
+        String path = Environment.getExternalStorageDirectory() + File.separator + "test.jpg";
+        request.setCallback(new FileCallback() {
+            @Override
+            public void onProgressUpdated(int curLen, int totalLen) {
+                Log.e("stay", "download:" + curLen + "/" + totalLen);
+                if(curLen * 100l / totalLen > 50){
+//                    task.cancel(true);
+                    request.cancel();
+                }
+            }
+
+
+            @Override
+            public void onSuccess(String path) {
+                Log.e("stay", path);
+            }
+
+            @Override
+            public void onFailure(AppException e) {
+                if (e.type == AppException.ErrorType.CANCEL){
+
+                }
+                e.printStackTrace();
+            }
+        }.setCachePath(path));
+        request.enableProgressUpdated(true);
+
         task.execute();
     }
 }

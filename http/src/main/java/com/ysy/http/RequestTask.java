@@ -29,9 +29,11 @@ public class RequestTask extends AsyncTask<Void, Integer, Object> {
                 if (!request.onGlobalExceptionListener.handleException((AppException) o)) {
                     request.iCallback.onFailure((AppException) o);
                 }
+            }else {
+                request.iCallback.onFailure((AppException) o);
             }
         } else {
-            request.iCallback.onSucess(o);
+            request.iCallback.onSuccess(o);
         }
     }
 
